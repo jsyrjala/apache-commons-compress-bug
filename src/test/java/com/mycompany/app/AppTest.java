@@ -33,16 +33,29 @@ public class AppTest {
     }
 
     @Test
-    public void testUnzip() throws IOException {
-        File root = new File("./target");
-        root.mkdirs();
-        for (File file: files) {
-            File targetDir = Files.createTempDirectory(root.toPath(), "unzip").toFile();
-            unzip(file, targetDir, expectedSize.get(file));
-        }
+    public void testFile1() throws IOException {
+        testFile(file1, 1024);
     }
 
-    private File unzip(File file, File targetDir, long expectedSize) throws IOException {
+    @Test
+    public void testFile2() throws IOException {
+        testFile(file2, 1024);
+    }
+
+    @Test
+    public void testFile3() throws IOException {
+        testFile(file3, 1024);
+    }
+
+    private void testFile(File file, int bufferSize) throws IOException {
+        File root = new File("./target");
+        root.mkdirs();
+        System.out.println("Extracting file " + file.getAbsolutePath());
+        File targetDir = Files.createTempDirectory(root.toPath(), "unzip").toFile();
+        unzip(file, targetDir, expectedSize.get(file), bufferSize);
+    }
+
+    private File unzip(File file, File targetDir, long expectedSize, int bufferSize) throws IOException {
         ZipFile zipFile = new ZipFile(file);
         Enumeration<ZipArchiveEntry> entryEnum = zipFile.getEntries();
         int entryCount = 0;
@@ -55,10 +68,10 @@ public class AppTest {
             assertEquals(expectedSize, entry.getSize());
             File targetFile = new File(targetDir, entry.getName());
             assertFalse(targetFile.exists());
-            int bufferSize = 1024;
 
             try(FileOutputStream fos = new FileOutputStream(targetFile);
                 InputStream is = zipFile.getInputStream(entry)) {
+                System.out.println("InputStream impl:" + is.getClass().getCanonicalName());
                 copy(is, fos, bufferSize);
             }
             assertEquals(expectedSize, targetFile.length());
@@ -77,7 +90,7 @@ public class AppTest {
              * Reads some number of bytes from the input stream and stores them into the buffer array b. The number of bytes actually read is returned as an integer. This method blocks until input data is available, end of file is detected, or an exception is thrown.
              * If the length of b is zero, then no bytes are read and 0 is returned; otherwise, there is an attempt to read at least one byte. If no byte is available because the stream is at the end of the file, the value -1 is returned; otherwise, at least one byte is read and stored into b.
              */
-            Assertions.assertTrue(bufferSize > 0 && size > 0, "read can return 0 only when length of buf is 0");
+            Assertions.assertTrue(bufferSize > 0 && size != 0, "read can return 0 only when length of buf is 0");
             if (size < 0) {
                 break;
             }
