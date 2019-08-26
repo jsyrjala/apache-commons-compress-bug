@@ -1,3 +1,5 @@
+# Test case for https://issues.apache.org/jira/browse/COMPRESS-491
+
 https://docs.oracle.com/javase/7/docs/api/java/io/InputStream.html#read(byte[])
 
 > Reads some number of bytes from the input stream and stores them into the buffer array b. The number of bytes actually read is returned as an integer. This method blocks until input data is available, end of file is detected, or an exception is thrown.
